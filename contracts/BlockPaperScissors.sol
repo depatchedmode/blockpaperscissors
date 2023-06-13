@@ -3,12 +3,10 @@ pragma solidity ^0.8.13;
 
 contract BlockPaperScissors {
   enum Move {
-    Null,
+    Stalemate,
     Block,
     Paper,
-    Scissors,
-    Stalemate,
-    Draw
+    Scissors
   }
 
   struct User {
@@ -50,6 +48,8 @@ contract BlockPaperScissors {
   function castVote(Move move, uint256 blockHeight) public {
     require(move >= Move.Block && move <= Move.Scissors, 'Invalid move');
     require(blockHeight <= block.number, 'Invalid block height');
+    
+    if (blockHeight == 0) blockHeight = block.number;
 
     User storage user = users[msg.sender];
     if (user.totalMoves == 0) {
@@ -311,6 +311,12 @@ contract BlockPaperScissors {
       topStreaks[i] = winningStreaks[i];
     }
     return topStreaks;
+  }
+
+  function getBlockResult(
+    uint256 blockheight
+  ) public view returns (BlockResult memory) {
+    return blockResults[blockheight];
   }
 
   function getResultsOfPreviousBlocks(
